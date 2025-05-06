@@ -1,40 +1,92 @@
-import os
+# Base class
+class Smartphone:
+    def __init__(self, brand, model, storage, battery):
+        self.brand = brand
+        self.model = model
+        self.storage = storage  # in GB
+        self._battery = battery  # Protected attribute
 
-def modify_content(text):
-    # Example modification: Convert to uppercase
-    return text.upper()
+    def charge(self, amount):
+        if amount < 0:
+            print("❌ Cannot charge with a negative amount.")
+            return
+        self._battery = min(100, self._battery + amount)
+        print(f"{self.model} charged to {self._battery}%")
 
-def read_and_write_file():
-    input_filename = input("Enter the name of the file to read: ")
+    def specs(self):
+        return f"{self.brand} {self.model} with {self.storage}GB storage and {self._battery}% battery."
 
-    try:
-        # Check if the file exists
-        if not os.path.exists(input_filename):
-            raise FileNotFoundError(f"The file '{input_filename}' does not exist.")
+# Subclass 1: GamingPhone (inherits from Smartphone)
+class GamingPhone(Smartphone):
+    def __init__(self, brand, model, storage, battery, cooling_system):
+        super().__init__(brand, model, storage, battery)
+        self.cooling_system = cooling_system
 
-        # Open the input file with UTF-8 encoding
-        with open(input_filename, 'r', encoding='utf-8') as infile:
-            content = infile.read()
-            print("✅ File read successfully.")
-        
-        # Modify the content
-        modified_content = modify_content(content)
+    def specs(self):  # Polymorphism in action
+        return f"{self.brand} {self.model} (Gaming Edition): {self.storage}GB storage, {self.cooling_system} cooling, Battery: {self._battery}%"
 
-        # Generate output filename in the same directory as the input file
-        base_name = os.path.basename(input_filename)
-        output_filename = "modified_" + base_name
+# Subclass 2: CameraPhone (inherits from Smartphone)
+class CameraPhone(Smartphone):
+    def __init__(self, brand, model, storage, battery, megapixels):
+        super().__init__(brand, model, storage, battery)
+        self.__megapixels = megapixels  # Private attribute (Encapsulation)
 
-        # Write the modified content to the output file
-        with open(output_filename, 'w', encoding='utf-8') as outfile:
-            outfile.write(modified_content)
-            print(f"✅ Modified content written to: {output_filename}")
+    def get_camera_quality(self):
+        return f"Camera quality: {self.__megapixels}MP"
 
-    except FileNotFoundError as e:
-        print(f"❌ Error: {e}")
-    except PermissionError:
-        print("❌ Error: Permission denied when accessing the file.")
-    except Exception as e:
-        print(f"❌ An unexpected error occurred: {e}")
+    def specs(self):
+        return f"{self.brand} {self.model} (Camera Edition): {self.storage}GB storage, {self.__megapixels}MP camera, Battery: {self._battery}%"
+
+# Subclass demonstrating polymorphism
+class Speedster(Superhero):
+    def __init__(self, name, universe, speed_level):
+        super().__init__(name, "Super Speed", universe)
+        self.speed_level = speed_level
+
+    def reveal_identity(self):  # Polymorphism
+        return f"{self.name} blazes through the {self.universe} universe at level {self.speed_level} speed!"
+
+# Polymorphism Challenge — Vehicles in Motion
+class Vehicle:
+    def move(self):
+        print("The vehicle is moving.")
+
+class Car(Vehicle):
+    def move(self):
+        print("Driving 🚗")
+
+class Plane(Vehicle):
+    def move(self):
+        print("Flying ✈️")
+
+class Boat(Vehicle):
+    def move(self):
+        print("Sailing 🚤")
+
+# Demonstrating Polymorphism
+def demonstrate_vehicle_movement(vehicle):
+    vehicle.move()
 
 if __name__ == "__main__":
-    read_and_write_file()
+    # Create a GamingPhone instance
+    gaming_phone = GamingPhone("BrandX", "ModelG", 128, 50, "Liquid Cooling")
+    print(gaming_phone.specs())
+    gaming_phone.charge(30)
+
+    # Create a CameraPhone instance
+    camera_phone = CameraPhone("BrandY", "ModelC", 64, 80, 108)
+    print(camera_phone.specs())
+    print(camera_phone.get_camera_quality())
+    camera_phone.charge(-10)  # Invalid charge
+
+    # Superhero example
+    flash = Speedster("Flash", "DC", 10)
+    print(flash.reveal_identity())
+    flash.set_secret_identity("Barry Allen")
+    print(f"Secret Identity: {flash.get_secret_identity()}")
+
+    # Vehicle polymorphism example
+    print("\nVehicle Movements:")
+    vehicles = [Car(), Plane(), Boat()]
+    for v in vehicles:
+        demonstrate_vehicle_movement(v)
